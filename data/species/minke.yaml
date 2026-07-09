@@ -1,0 +1,196 @@
+# Common Minke Whale (Balaenoptera acutorostrata) - VALIDATION PROXY config
+# =========================================================================
+# This is the calibration species for the validation gate: Folkow & Blix (1992)
+# made the key stratified measurements on minke (deep body 34.7 C, core/blubber
+# interface 28.8 C, total heat loss 3.4-4.87 W/kg^0.75 in 2.5-5.5 C water).
+# GEOMETRY IS A PROXY: the sei-whale surface, scaled to a realistic minke size
+# (~8 m), is used because no dedicated minke mesh exists. Minke and sei are both
+# slender Balaenoptera rorquals, so the body plan (surface/volume) is a good
+# match; the thermal parameters below are minke-specific from the literature.
+# See scripts/validation/validate_against_measurements.py.
+
+species: minke
+common_name: Common Minke Whale
+scientific_name: Balaenoptera acutorostrata
+
+# Morphometrics
+body_mass_kg: 7000              # Adult ~8 m, ~7 t (smallest rorqual; Folkow & Blix 1992 study animals)
+
+# -----------------------------------------------------------------------------
+# Physiology
+# -----------------------------------------------------------------------------
+# Deep-body temperature 34.7 C measured by Folkow & Blix (1992); arterial set-point
+# taken slightly above so the well-perfused deep core equilibrates near 34.7 C.
+core_temperature_C: 35.0        # Folkow & Blix 1992 deep body 34.7 C (arterial ~= deep body)
+core_temperature_min_C: 28.0    # Lethal-hypothermia GUARD (see docs/lethal_hypothermia_threshold.md)
+core_temperature_max_C: 40.0    # Lethal-hyperthermia GUARD
+
+# Minke are cold-water rorquals (polar to temperate); Folkow & Blix ran at ~3-5 C.
+thermoneutral_water_C: 10.0
+
+# -----------------------------------------------------------------------------
+# Scaling factors
+# -----------------------------------------------------------------------------
+fmr_watts: 3118                 # 4.07 W/kg^0.75 x 7000^0.75(766). Folkow & Blix 1992 measured
+                                # sensible heat loss 3.81 +/- 0.53 + respiratory 0.26 W/kg^0.75.
+                                # At steady state total metabolism = total heat loss => FMR = 4.07 W/kg^0.75.
+                                # NOTE: the model computes SENSIBLE (surface) loss only; the gate target
+                                # for model Q_loss is 3.81 W/kg^0.75 (= 2919 W at 7000 kg), Q_loss/FMR ~ 0.94.
+fmr_source: "Folkow & Blix 1992 (PMID 1442122): sensible heat loss 3.81+/-0.53 + respiratory 0.26 W/kg^0.75, study animals 1840-5740 kg."
+perfusion_scale: 0.012          # BLUBBER-side CCHE reduction only (D1/A12); core keeps full arterial omega_b=0.8.
+transition_fraction: 0.15
+region_blend_iterations: 150
+region_blend_alpha: 0.5
+
+# Minke blubber conductivity measured directly: k=0.25 W/m-K (Kvadsheim, Folkow & Blix 1996).
+thermal_properties:
+  blubber:
+    thermal_conductivity_W_mK: 0.25
+
+# -----------------------------------------------------------------------------
+# Transient solver defaults
+# -----------------------------------------------------------------------------
+dt_seconds: 300
+total_hours: 48
+min_hours: 24
+steady_eps: 1.0e-5
+
+# -----------------------------------------------------------------------------
+# Mesh paths (sei geometry scaled to ~8 m; see scripts to build)
+# -----------------------------------------------------------------------------
+mesh:
+  surface_obj: assets/meshes/minke_surface.obj
+  volume_mesh: assets/meshes/minke_variable_blubber.vtu
+  volume_raw: assets/meshes/minke_volume_full_gmsh.vtk
+  element_size: 0.07
+
+# -----------------------------------------------------------------------------
+# Data paths
+# -----------------------------------------------------------------------------
+data:
+  vertex_groups: data/minke/vertex_groups.json
+  surface_mesh: data/minke/surface_mesh.json
+  surface_regions: data/minke/surface_regions.json
+  tissue_info: data/minke/tissue_info_variable.json
+
+# -----------------------------------------------------------------------------
+# Regional blubber thickness (meters) -- minke is thin-blubbered (~3 cm mid-body)
+# Regional ratios follow the fin/sei rorqual template.
+# -----------------------------------------------------------------------------
+blubber_thickness:
+  Body: 0.0450            # 4.5 cm - cold-water NE Atlantic minke trunk blubber. F&B 1992 measured
+                         # total heat loss ~1970 W for ~3800 kg animals at interface 28.8 C; with
+                         # k=0.25 that implies trunk R_blub ~ 0.16-0.20 => t ~ 4-5 cm (not 3 cm).
+                         # 3 cm forced R_blub ~ R_conv, parking trunk skin at ~19 C (unphysical).
+  Peduncle: 0.0350        # scaled from Body (ratio 0.778)
+  Rostrum: 0.0200         # scaled from Body (ratio 0.444)
+  LeftPectoralFlipper: 0.0067   # appendages genuinely thin (thermal windows) - not scaled with trunk
+  RightPectoralFlipper: 0.0067
+  Fluke: 0.0083
+  DorsalFin: 0.0060
+  VentralGrooves: 0.0300         # belly/ventral-groove blubber: at rest the grooves are
+                                 # contracted and insulated by near-trunk-thickness blubber
+                                 # (only distended/thinned during lunge-feeding). The region
+                                 # overlies warm ventral trunk core, so a thin (1 cm) value
+                                 # made it a spurious heat window.
+
+# -----------------------------------------------------------------------------
+# Convection coefficients (W/m^2-K) -- EFFECTIVE surface conductance (#19/A5).
+# Bare forced convection over a body in water is high (~100-500), which would pin
+# the skin AT water temperature. But infrared observations of cetaceans show the
+# skin sits 1-3 C ABOVE ambient (Cuyler 1992; Heath 1999; Noren 1999), i.e. the
+# effective surface conductance -- including the epidermal/mucus/laminar sublayer
+# and the outermost tissue -- is MODERATE. We set h to the effective value that
+# reproduces both the observed skin-water offset AND the Folkow & Blix whole-body
+# heat loss: h ~ 35-60, roughly uniform, slightly higher on small appendages.
+# Regional heat-loss differences come from blubber thickness + two-sublayer CCHE
+# recovery + appendage perfusion (cche_effectiveness), NOT from h.
+convection_base:
+  Body: 35.0
+  Peduncle: 40.0
+  Rostrum: 50.0
+  DorsalFin: 55.0
+  VentralGrooves: 45.0
+  Fluke: 60.0
+  LeftPectoralFlipper: 60.0
+  RightPectoralFlipper: 60.0
+
+# Two-sublayer blubber (#18 / D5): inner vascular sublayer effective k reduced by
+# cutaneous counter-current recovery. inner_fraction of blubber thickness = inner
+# sublayer. The recovery factor is CALIBRATED (disclosed) against the Folkow & Blix
+# whole-body heat loss: it sets the live-animal effective blubber conductance below
+# the excised value (Kvadsheim 0.25), representing heat recovered by paired
+# cutaneous vessels (Scholander & Schevill 1955). It is the single free parameter
+# that fixes absolute heat-loss magnitude; the temperature STRUCTURE (interface,
+# deep body, skin) is reproduced independently of it.
+blubber_inner_fraction: 0.5
+blubber_cche_recovery: 0.5     # k_inner_eff = 0.25 x 0.5 = 0.125 W/m-K (validated structure)
+
+# Peripheral counter-current shell (#28): outer body-wall core as a variable-
+# conductance shell (Aschoff & Wever 1958 core-shell; Bazett 1948 venae comitantes;
+# Weinbaum & Jiji 1985). k_eff = 0.56 x (1-0.85) = 0.084 W/m-K in the outer 15 cm of
+# core, anchored to the F&B measured core->interface gradient (34.7 -> 28.8 C).
+peripheral_cc_effectiveness: 0.85
+peripheral_cc_depth_m: 0.15
+
+# Cold-water peripheral vasoconstriction: the shell is near-avascular (floor ~0),
+# so net perfusion heat delivery -> 0 and Q_loss -> metabolism (F&B closure).
+core_perfusion_floor: 0.02
+core_perfusion_taper_m: 0.15
+
+# Weinbaum-Jiji energy-bounded perfusion (fasting/RMR-only scenario): solve the
+# arterial temperature as the perfusion-weighted mean tissue T so blood
+# redistributes (net 0) -> Q_loss = FMR and the deep body is a prediction (it
+# cools if RMR heat alone is insufficient). OFF for the fed/homeothermic scenario,
+# where the fixed arterial set-point represents a core defended by food-fuelled
+# thermogenesis (RMR + heat increment of feeding + facultative thermogenesis).
+solved_arterial_temperature: false
+
+# -----------------------------------------------------------------------------
+# Thermoregulatory regions
+# -----------------------------------------------------------------------------
+thermoregulatory_regions:
+  - Body
+  - LeftPectoralFlipper
+  - RightPectoralFlipper
+  - Fluke
+  - DorsalFin
+  - VentralGrooves
+  - Rostrum
+
+# -----------------------------------------------------------------------------
+# Counter-current heat-exchange (CCHE) control (D2; docs/cche_effectiveness.md)
+# -----------------------------------------------------------------------------
+appendage_perfusion_max: 0.5
+cche_saturation_C: 5.0          # windows fully engage retia within ~5 C below TNZ (cold-water rorqual)
+# Appendage-root retia (#26): effective-conductivity choke on the fluke/flipper/
+# dorsal-fin core highway (Scholander & Schevill 1955; Kvadsheim & Folkow 1997
+# measured ~10x flipper heat-loss modulation, i.e. eps_rete ~ 0.9).
+appendage_rete_effectiveness: 0.85
+appendage_rete_regions:
+  - Fluke
+  - LeftPectoralFlipper
+  - RightPectoralFlipper
+  - DorsalFin
+cche_effectiveness:
+  LeftPectoralFlipper:  { min: 0.15, max: 0.90 }
+  RightPectoralFlipper: { min: 0.15, max: 0.90 }
+  Fluke:                { min: 0.15, max: 0.90 }
+  Rostrum:              { min: 0.20, max: 0.70 }
+  DorsalFin:            { min: 0.15, max: 0.70 }
+  VentralGrooves:       { min: 0.15, max: 0.70 }
+
+# -----------------------------------------------------------------------------
+# Locomotion parameters (minke are fast; use a modest cruising value)
+# -----------------------------------------------------------------------------
+locomotion:
+  metabolic_multiplier: 3.5       # Williams (1999) COT at 7 t, ~2.5 m/s
+  convection_multiplier: 2.0
+  swimming_speed_m_s: 2.5
+
+# -----------------------------------------------------------------------------
+# Default simulation cases (validation focus: cold water)
+# -----------------------------------------------------------------------------
+default_cases:
+  - { water_temp_C: 3.0,  mode: active }
+  - { water_temp_C: 5.0,  mode: active }

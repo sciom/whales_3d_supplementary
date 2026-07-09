@@ -1,0 +1,35 @@
+# OS/editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Python/cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# LaTeX/build
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.synctex.gz
+
+# Large raw solver outputs intentionally excluded from this curated repo
+*.vtu
+*.vtk
+*.xdmf
+*.h5
+*.hdf5
+
+# Local environments
+.venv/
+venv/
+env/
+.conda/
+*.egg-info/

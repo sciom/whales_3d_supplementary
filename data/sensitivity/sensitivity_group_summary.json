@@ -1,0 +1,72 @@
+[
+  {
+    "species": "humpback",
+    "parameter_group": "BCI conductance proxy",
+    "n_cases": 6,
+    "max_abs_delta_core_C": 0.08821187461126101,
+    "max_abs_delta_TES": 0.0,
+    "max_abs_delta_Q_loss_pct": 12.213836425390419,
+    "max_abs_delta_Mcal_day_pct": 12.213836425390387,
+    "max_abs_delta_window_fraction": 0.027822320397577538
+  },
+  {
+    "species": "humpback",
+    "parameter_group": "CCHE effectiveness",
+    "n_cases": 6,
+    "max_abs_delta_core_C": 0.11807766119136431,
+    "max_abs_delta_TES": 0.10272212053567154,
+    "max_abs_delta_Q_loss_pct": 19.454221999773658,
+    "max_abs_delta_Mcal_day_pct": 19.454221999773658,
+    "max_abs_delta_window_fraction": 0.06078834678626571
+  },
+  {
+    "species": "humpback",
+    "parameter_group": "appendage perfusion",
+    "n_cases": 6,
+    "max_abs_delta_core_C": 0.04448669305298836,
+    "max_abs_delta_TES": 0.0,
+    "max_abs_delta_Q_loss_pct": 21.754284178879182,
+    "max_abs_delta_Mcal_day_pct": 21.75428417887916,
+    "max_abs_delta_window_fraction": 0.03834210598171439
+  },
+  {
+    "species": "humpback",
+    "parameter_group": "blubber conductance",
+    "n_cases": 6,
+    "max_abs_delta_core_C": 0.034872632532312764,
+    "max_abs_delta_TES": 0.0,
+    "max_abs_delta_Q_loss_pct": 4.967183113473554,
+    "max_abs_delta_Mcal_day_pct": 4.967183113473527,
+    "max_abs_delta_window_fraction": 0.012239909018966155
+  },
+  {
+    "species": "humpback",
+    "parameter_group": "lambda",
+    "n_cases": 9,
+    "max_abs_delta_core_C": 0.05944469033738642,
+    "max_abs_delta_TES": 0.13641628085006086,
+    "max_abs_delta_Q_loss_pct": 14.813704763183575,
+    "max_abs_delta_Mcal_day_pct": 14.81370476318357,
+    "max_abs_delta_window_fraction": 0.05313809421740112
+  },
+  {
+    "species": "humpback",
+    "parameter_group": "surface conductance",
+    "n_cases": 6,
+    "max_abs_delta_core_C": 0.017957159326101646,
+    "max_abs_delta_TES": 0.0,
+    "max_abs_delta_Q_loss_pct": 8.336874731066034,
+    "max_abs_delta_Mcal_day_pct": 8.336874731066045,
+    "max_abs_delta_window_fraction": 0.003397024864126519
+  },
+  {
+    "species": "humpback",
+    "parameter_group": "thermoneutral anchor",
+    "n_cases": 6,
+    "max_abs_delta_core_C": 0.05944469033738642,
+    "max_abs_delta_TES": 0.07236803267343828,
+    "max_abs_delta_Q_loss_pct": 14.813704763183575,
+    "max_abs_delta_Mcal_day_pct": 14.81370476318357,
+    "max_abs_delta_window_fraction": 0.05313809421740112
+  }
+]

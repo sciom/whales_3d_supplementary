@@ -1,0 +1,146 @@
+# Bowhead Whale (Balaena mysticetus) - Species Configuration
+# ==========================================================
+# Bowhead parameters adapted from right whale with bowhead-specific values.
+# Sources: NSB bowhead energetics; COSEWIC 2023; Scientific Reports 2018.
+
+species: bowhead
+common_name: Bowhead Whale
+scientific_name: Balaena mysticetus
+
+# Morphometrics
+body_mass_kg: 80000             # Adult ~17 m, ~80 t (robust adult; bowhead adults 15-18 m, to ~100 t; COSEWIC 2023)
+
+# Physiology
+# Deep body temperature reported ~33.8 C for bowhead whales (George et al. 2009, NSB).
+# min/max are lethal GUARDS (comparative physiology), not normal-range bounds. See docs/lethal_hypothermia_threshold.md
+core_temperature_C: 33.8
+core_temperature_min_C: 28.0    # Lethal-hypothermia GUARD (comparative mammalian cardiac limit ~28 C; no measured cetacean value). See docs/lethal_hypothermia_threshold.md
+core_temperature_max_C: 40.0    # Lethal-hyperthermia GUARD (mammalian lethal ~42 C); not a normal-range bound.
+
+# Bowheads target near-freezing waters (-1.6 to 2.7 C mean range).
+# We use 0 C as a thermoneutral anchor within the preferred SST range.
+thermoneutral_water_C: 0.0
+
+# Scaling factors
+# NSB reports low metabolic rates for bowheads; keep conservative scale.
+# See docs/metabolic_derivation.md for allometric context
+metabolic_scale: 0.004          # DEPRECATED (A4/D3): no longer drives Q_m (now FMR-forward from fmr_watts); kept for diagnostic. See docs/metabolic_derivation.md
+fmr_watts: 8096                 # ~50% Kleiber BMR (3.4*M^0.75) at 80 t = 0.5*16191 W (consistent with other species)
+fmr_source: "0.5 x Kleiber BMR at 80 t; consistent w/ George 2009 NSB low-FMR note"
+perfusion_scale: 0.012          # BLUBBER-side CCHE reduction only (D1/A12); core keeps full arterial omega_b=0.8. Baseline under A2 review.
+transition_fraction: 0.15
+region_blend_iterations: 150
+region_blend_alpha: 0.5
+
+# Transient solver defaults
+dt_seconds: 300
+total_hours: 240
+min_hours: 48
+steady_eps: 1.0e-5
+
+# Mesh paths
+# NOTE: surface_obj and volume_raw will point to the dedicated bowhead geometry
+# once import_bowhead.py has been run in Blender and preprocessing completed.
+# Until then, the right whale proxy is retained as a fallback (commented out below).
+mesh:
+  # Dedicated bowhead geometry (3D Molier model; replaces the old right-whale proxy, audit A9/A13)
+  surface_obj: assets/meshes/bowhead_surface.obj
+  volume_mesh: assets/meshes/bowhead_variable_blubber.vtu
+  volume_raw: assets/meshes/bowhead_volume_full_gmsh.vtk
+  element_size: 0.07            # UNIFORM physical element size across all species (run with --uniform-edge);
+                               # surface resampled to ~0.07 m edges so node/tet count scales with body volume -> comparable meshes.
+
+# Data paths (copies of right whale region files)
+data:
+  vertex_groups: data/bowhead/vertex_groups.json
+  surface_mesh: data/bowhead/surface_mesh.json
+  surface_regions: data/bowhead/surface_regions.json
+  tissue_info: data/bowhead/tissue_info_variable.json
+
+# Blubber thickness in meters by region
+# Body thickness anchored to bowhead max values in COSEWIC and blubber reviews.
+# Other regions scaled from right whale regional ratios.
+# Body 28 cm = upper end of the MEASURED COSEWIC (2023) range (5.5-28 cm), not the
+# "up to ~50 cm" extreme (a single fat site, not a body average). Keeps the bowhead the
+# thickest-blubbered species while using a measured, representative value like the others.
+# Regional values keep the right-whale ratios (Peduncle 0.70, Rostrum 0.30, flipper 0.15, Fluke 0.175).
+blubber_thickness:
+  Body: 0.2800                  # 28 cm - upper measured COSEWIC range (was 50 cm max; see docs/bowhead_references.md)
+  Peduncle: 0.1960              # scaled from Body (ratio 0.70)
+  Rostrum: 0.0840               # scaled from Body (ratio 0.30)
+  LeftPectoralFlipper: 0.0420   # scaled from Body (ratio 0.15)
+  RightPectoralFlipper: 0.0420  # scaled from Body (ratio 0.15)
+  Fluke: 0.0490                 # scaled from Body (ratio 0.175)
+
+# Baseline convection coefficients (W/m^2-K)
+# Bowheads lack a dorsal fin; thermal windows are flippers and fluke.
+# Effective surface conductance (#19/A5): physical water-side values; insulation
+# in blubber + rete/shell counter-current terms, not a fake low h.
+convection_base:
+  Body: 35.0
+  Peduncle: 40.0
+  Rostrum: 50.0
+  Fluke: 60.0
+  LeftPectoralFlipper: 60.0
+  RightPectoralFlipper: 60.0
+
+# Thermoregulation capacity
+convection_capacity:
+  LeftPectoralFlipper: { min: 0.4, max: 2.5 }
+  RightPectoralFlipper: { min: 0.4, max: 2.5 }
+  Fluke: { min: 0.4, max: 2.5 }
+  Rostrum: { min: 0.8, max: 1.3 }
+
+# Thermoregulatory regions (vascular control / countercurrent exchange)
+thermoregulatory_regions:
+  - Body
+  - LeftPectoralFlipper
+  - RightPectoralFlipper
+  - Fluke
+  - Rostrum
+
+# Perfusion modulation capacity (modeled ranges; see docs/bowhead_references.md)
+perfusion_capacity:
+  Body: { min: 0.7, max: 1.3 }
+  LeftPectoralFlipper: { min: 0.05, max: 3.0 }
+  RightPectoralFlipper: { min: 0.05, max: 3.0 }
+  Fluke: { min: 0.05, max: 3.0 }
+  Rostrum: { min: 0.2, max: 1.5 }
+
+# Locomotion parameters for swimming (moving) mode
+# Metabolic multiplier derived from Williams (1999) cost-of-transport equation:
+#   COT_total = 7.79 * M^(-0.29) J/kg/m (Phil. Trans. R. Soc. B 354:193-201)
+#   At ~60,000 kg and 1.2 m/s: total MR ≈ 1.8x Kleiber BMR; rounded to 2.0x
+# Swimming speed: ~1.2 m/s active swimming (Simon et al. 2009, Proc. R. Soc. B 276:3819)
+#   Quakenbush et al. (2012) satellite telemetry: 0.8-1.7 m/s, avg migration ~1.4 m/s
+#   Simon et al. report 1.2-1.4 m/s ascent/descent, 0.7-0.8 m/s foraging at depth
+# Balaenid body plan: slowest sustained swimmers among large whales
+locomotion:
+  metabolic_multiplier: 2.0       # Williams (1999) COT at 60 t, 1.2 m/s -> ~1.8x; rounded to 2.0
+  convection_multiplier: 1.7      # h ~ v^0.8 scaling (Incropera et al. 2011): (1.2/1.0)^0.8 ≈ 1.2, fitted to 1.7
+  swimming_speed_m_s: 1.2
+
+
+# Counter-current heat-exchange (CCHE) control -- D2 / audit A2,A3.
+# Thermoregulation = appendage effectiveness epsilon in [0,1] (cold->conserve,
+# warm->dump), applied to the dilated appendage AVA perfusion. This REPLACES the
+# perfusion_capacity magnitude control below (now DEPRECATED/unused) and any
+# h-modulation (h is flow/geometry only). See docs/cche_effectiveness.md.
+appendage_perfusion_max: 0.5      # omega_app, dilated AVA capacity [kg/m3/s]; SENSITIVITY var (sweep 0.3-0.8)
+cche_effectiveness:               # epsilon range per window: min=dump (AVAs open), max=conserve (retia)
+  LeftPectoralFlipper:  { min: 0.15, max: 0.90 }
+  RightPectoralFlipper: { min: 0.15, max: 0.90 }
+  Fluke:                { min: 0.15, max: 0.90 }
+  Rostrum:              { min: 0.20, max: 0.70 }
+
+# Default simulation cases
+default_cases:
+  - { water_temp_C: -2.0, mode: active }
+  - { water_temp_C: 0.0,  mode: active }
+  - { water_temp_C: 5.0,  mode: active }
+  - { water_temp_C: 10.0, mode: active }
+  - { water_temp_C: 15.0, mode: active }
+  - { water_temp_C: 20.0, mode: active }
+  - { water_temp_C: 25.0, mode: active }
+  - { water_temp_C: 28.0, mode: active }
+  - { water_temp_C: 30.0, mode: active }

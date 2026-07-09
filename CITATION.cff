@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: "Supplementary materials for a comparative 3D finite-element bioheat analysis of mysticete thermoregulation"
+message: "If you use these supplementary materials, please cite the associated manuscript and archived repository DOI."
+type: dataset
+authors:
+  - family-names: "Domagoj"
+    given-names: "T."
+  - family-names: "Tamara"
+    given-names: "D."
+  - family-names: "Branimir"
+    given-names: "K. H."
+repository-code: "TODO: add archive URL or DOI"
+date-released: "2026-07-09"
+license: "CC-BY-4.0"

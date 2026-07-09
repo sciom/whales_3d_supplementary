@@ -1,0 +1,165 @@
+# Humpback Whale (Megaptera novaeangliae) - Species Configuration
+# ================================================================
+# All species-specific parameters for thermal FEM simulation.
+# Sources: Kvadsheim et al. 1997, Williams et al. 1999, Worthy & Edwards 1990
+
+species: humpback
+common_name: Humpback Whale
+scientific_name: Megaptera novaeangliae
+
+# Morphometrics
+body_mass_kg: 30000             # Adult mass ~30 t (Lockyer 1976; Christiansen et al. 2022, Methods Ecol. Evol.)
+
+# Physiology
+core_temperature_C: 36.0        # Measured deep-body temp (Morrison 1962, harpooned humpback); was 36.8 on weak SeaWorld/K&S cite
+core_temperature_min_C: 28.0    # Lethal-hypothermia GUARD (comparative mammalian cardiac limit ~28 C; no measured cetacean value). See docs/lethal_hypothermia_threshold.md
+core_temperature_max_C: 40.0    # Lethal-hyperthermia GUARD (mammalian lethal ~42 C); not a normal-range bound.
+thermoneutral_water_C: 25.0     # Baseline water temp for no active control
+
+# Scaling factors (calibrated for this species)
+# See docs/metabolic_derivation.md for allometric context
+metabolic_scale: 0.004          # DEPRECATED (A4/D3): no longer drives Q_m (now FMR-forward from fmr_watts); kept for diagnostic. See docs/metabolic_derivation.md
+fmr_watts: 3864                 # FMR estimate: ~50% Kleiber BMR for large rorquals (Blawas et al. 2025, Science Advances)
+fmr_source: "Blawas et al. 2025 Science Advances; ~50% of Kleiber at 30 t"
+perfusion_scale: 0.012          # BLUBBER-side CCHE reduction only (D1/A12); core keeps full arterial omega_b=0.8. Baseline under A2 review.
+                                # ≈ 0.55 ml/100g/min, consistent with Hokkanen (1990, J Theor Biol 143:469-477)
+                                # modelled range 0.003–0.017 kg/(m³·s) for cetacean tissue.
+                                # Validated against right whale (0.012) which produces physically
+                                # realistic heat balance at -2°C. Prior value 0.10 was ~8× too high,
+                                # causing Q_loss >> FMR for all rorquals.
+transition_fraction: 0.15       # Fraction of blubber thickness used for smooth blubber-core transition
+region_blend_iterations: 150    # Laplacian smoothing iterations for inter-region blubber transitions
+region_blend_alpha: 0.5         # Smoothing weight per iteration (0=no change, 1=full neighbor average)
+
+# Transient solver defaults
+dt_seconds: 300                 # Time step (5 minutes)
+total_hours: 96                 # Simulation duration
+min_hours: 48
+steady_eps: 1.0e-5              # Convergence tolerance
+
+# Mesh paths (relative to project root)
+mesh:
+  surface_obj: assets/meshes/humpback_surface.obj
+  volume_mesh: assets/meshes/humpback_variable_blubber.vtu
+  volume_raw: assets/meshes/humpback_volume_full_gmsh.vtk
+  element_size: 0.07            # UNIFORM physical element size across all species (run with --uniform-edge);
+                               # surface resampled to ~0.07 m edges so node/tet count scales with body volume -> comparable meshes.
+
+# Data paths (relative to project root)
+data:
+  vertex_groups: data/humpback/vertex_groups.json
+  surface_mesh: data/humpback/surface_mesh.json
+  surface_regions: data/humpback/surface_regions.json
+  tissue_info: data/humpback/tissue_info_variable.json
+
+# Anatomical regions and their thermal properties
+# Blubber thickness in meters by region
+# Miller et al. (2011, Physiol. Biochem. Zool.) ultrasound surveys of humpback whales:
+#   seasonal range for juvenile/adult = 10.0-18.8 cm body blubber.
+#   Prior value of 6 cm was below the observed minimum; updated to 10.0 cm
+#   (conservative lower bound of published range).
+# All other regions scaled proportionally (factor 10/6 = 1.6667).
+blubber_thickness:
+  Body: 0.1000                  # 10 cm - conservative lower bound (Miller et al. 2011: 10.0-18.8 cm)
+  Peduncle: 0.0800             # scaled from Body (ratio 0.80)
+  Rostrum: 0.0360               # scaled from Body (ratio 0.36)
+  LeftPectoralFlipper: 0.0200   # scaled from Body (ratio 0.20)
+  RightPectoralFlipper: 0.0200  # scaled from Body (ratio 0.20)
+  Fluke: 0.0240                 # scaled from Body (ratio 0.24)
+  DorsalFin: 0.0160             # scaled from Body (ratio 0.16)
+  VentralGrooves: 0.0200        # scaled from Body (ratio 0.20)
+
+# Baseline convection coefficients (W/m^2-K) by region at thermoneutral
+# Heat-dumping hierarchy: flukes/flippers > grooves > dorsal/rostrum > body
+# Forced convection scaling: h ~ U^0.8 (turbulent flat-plate, Incropera et al. 2011)
+# Effective surface conductance (#19/A5): physical water-side values calibrated to
+# the observed 1-3 C skin-water offset; regional insulation now lives in blubber +
+# counter-current terms (rete/shell), not in a fake low h. (Was an air-like 8-180 ramp.)
+convection_base:
+  Body: 35.0
+  Peduncle: 40.0
+  Rostrum: 50.0
+  DorsalFin: 55.0
+  VentralGrooves: 45.0
+  Fluke: 60.0
+  LeftPectoralFlipper: 60.0
+  RightPectoralFlipper: 60.0
+
+# Anatomical regions with active thermoregulation capacity
+# These regions contain vascular countercurrent heat exchangers (rete mirabile)
+# that allow selective blood perfusion-based heat exchange.
+# Body is included for global perfusion scaling (narrow range).
+thermoregulatory_regions:
+  - Body
+  - LeftPectoralFlipper
+  - RightPectoralFlipper
+  - Fluke
+  - DorsalFin
+  - VentralGrooves
+  - Rostrum
+
+# Thermoregulation capacity (multiplier range when actively regulating)
+convection_capacity:
+  LeftPectoralFlipper: { min: 0.3, max: 3.0 }
+  RightPectoralFlipper: { min: 0.3, max: 3.0 }
+  Fluke: { min: 0.3, max: 3.0 }
+  VentralGrooves: { min: 0.5, max: 2.0 }
+  DorsalFin: { min: 0.7, max: 1.5 }
+  Rostrum: { min: 0.7, max: 1.5 }
+
+# Perfusion modulation capacity (multiplier range for active vascular control)
+perfusion_capacity:
+  Body: { min: 0.7, max: 1.3 }
+  LeftPectoralFlipper: { min: 0.05, max: 3.0 }
+  RightPectoralFlipper: { min: 0.05, max: 3.0 }
+  Fluke: { min: 0.05, max: 3.0 }
+  VentralGrooves: { min: 0.1, max: 2.0 }
+  DorsalFin: { min: 0.2, max: 1.5 }
+  Rostrum: { min: 0.2, max: 1.5 }
+
+# Locomotion parameters for swimming (moving) mode
+# Metabolic multiplier derived from Williams (1999) cost-of-transport equation:
+#   COT_total = 7.79 * M^(-0.29) J/kg/m (Phil. Trans. R. Soc. B 354:193-201)
+#   At ~30,000 kg and 2.0 m/s cruising: total MR ≈ 3.0x Kleiber BMR
+# Swimming speed: ~2.0 m/s routine cruising (Gough et al. 2019, J. Exp. Biol. 222:jeb204172)
+#   Noad & Cato (2007) report 1.1-1.8 m/s migration; Gough et al. tag-derived ~2 m/s
+# Note: Blawas et al. (2025, Science Advances) find bout-averaged foraging FMR only
+#   1.2-1.6x non-foraging; however, sustained swimming MR is higher than bout averages
+locomotion:
+  metabolic_multiplier: 3.0       # Williams (1999) COT at 30 t, 2.0 m/s -> ~3.0x Kleiber BMR
+  convection_multiplier: 1.7      # h ~ v^0.8 turbulent flat-plate (Incropera et al. 2011): (2.0/1.0)^0.8 = 1.74
+  swimming_speed_m_s: 2.0
+
+
+# Counter-current heat-exchange (CCHE) control -- D2 / audit A2,A3.
+# Thermoregulation = appendage effectiveness epsilon in [0,1] (cold->conserve,
+# warm->dump), applied to the dilated appendage AVA perfusion. This REPLACES the
+# perfusion_capacity magnitude control below (now DEPRECATED/unused) and any
+# h-modulation (h is flow/geometry only). See docs/cche_effectiveness.md.
+appendage_perfusion_max: 0.5      # omega_app, dilated AVA capacity [kg/m3/s]; SENSITIVITY var (sweep 0.3-0.8)
+cche_effectiveness:               # epsilon range per window: min=dump (AVAs open), max=conserve (retia)
+  LeftPectoralFlipper:  { min: 0.15, max: 0.90 }
+  RightPectoralFlipper: { min: 0.15, max: 0.90 }
+  Fluke:                { min: 0.15, max: 0.90 }
+  Rostrum:              { min: 0.20, max: 0.70 }
+  DorsalFin:            { min: 0.15, max: 0.70 }
+  VentralGrooves:       { min: 0.15, max: 0.70 }
+
+# Default simulation cases for multicase solver
+default_cases:
+  - { water_temp_C: -2.0, mode: active }
+  - { water_temp_C: 0.0,  mode: active }
+  - { water_temp_C: 5.0,  mode: active }
+  - { water_temp_C: 10.0, mode: active }
+  - { water_temp_C: 15.0, mode: active }
+  - { water_temp_C: 20.0, mode: active }
+  - { water_temp_C: 25.0, mode: active }
+  - { water_temp_C: 28.0, mode: active }
+  - { water_temp_C: 30.0, mode: active }
+
+# Fed / homeothermic scenario: fixed arterial set-point (core defended by
+# food-fuelled thermogenesis). Q_loss = field heat production = food requirement,
+# reported as an upper bound (~1.5x Pennes-reservoir over-prediction, minke-cal).
+# Weinbaum & Jiji 1985 energy-bounded mode (solved_arterial_temperature: true) is
+# the fasting/RMR deficit scenario -- confirmed a resting humpback cools at 5 C.
+solved_arterial_temperature: false

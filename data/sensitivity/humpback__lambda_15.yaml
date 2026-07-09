@@ -1,0 +1,141 @@
+species: humpback
+common_name: Humpback Whale
+scientific_name: Megaptera novaeangliae
+body_mass_kg: 30000
+core_temperature_C: 36.0
+core_temperature_min_C: 28.0
+core_temperature_max_C: 40.0
+thermoneutral_water_C: 25.0
+metabolic_scale: 0.004
+fmr_watts: 3864
+fmr_source: Blawas et al. 2025 Science Advances; ~50% of Kleiber at 30 t
+perfusion_scale: 0.012
+transition_fraction: 0.15
+region_blend_iterations: 150
+region_blend_alpha: 0.5
+dt_seconds: 300
+total_hours: 96
+min_hours: 48
+steady_eps: 1.0e-05
+mesh:
+  surface_obj: assets/meshes/humpback_surface.obj
+  volume_mesh: assets/meshes/humpback_variable_blubber.vtu
+  volume_raw: assets/meshes/humpback_volume_full_gmsh.vtk
+  element_size: 0.07
+data:
+  vertex_groups: data/humpback/vertex_groups.json
+  surface_mesh: data/humpback/surface_mesh.json
+  surface_regions: data/humpback/surface_regions.json
+  tissue_info: data/humpback/tissue_info_variable.json
+blubber_thickness:
+  Body: 0.1
+  Peduncle: 0.08
+  Rostrum: 0.036
+  LeftPectoralFlipper: 0.02
+  RightPectoralFlipper: 0.02
+  Fluke: 0.024
+  DorsalFin: 0.016
+  VentralGrooves: 0.02
+convection_base:
+  Body: 35.0
+  Peduncle: 40.0
+  Rostrum: 50.0
+  DorsalFin: 55.0
+  VentralGrooves: 45.0
+  Fluke: 60.0
+  LeftPectoralFlipper: 60.0
+  RightPectoralFlipper: 60.0
+thermoregulatory_regions:
+- Body
+- LeftPectoralFlipper
+- RightPectoralFlipper
+- Fluke
+- DorsalFin
+- VentralGrooves
+- Rostrum
+convection_capacity:
+  LeftPectoralFlipper:
+    min: 0.3
+    max: 3.0
+  RightPectoralFlipper:
+    min: 0.3
+    max: 3.0
+  Fluke:
+    min: 0.3
+    max: 3.0
+  VentralGrooves:
+    min: 0.5
+    max: 2.0
+  DorsalFin:
+    min: 0.7
+    max: 1.5
+  Rostrum:
+    min: 0.7
+    max: 1.5
+perfusion_capacity:
+  Body:
+    min: 0.7
+    max: 1.3
+  LeftPectoralFlipper:
+    min: 0.05
+    max: 3.0
+  RightPectoralFlipper:
+    min: 0.05
+    max: 3.0
+  Fluke:
+    min: 0.05
+    max: 3.0
+  VentralGrooves:
+    min: 0.1
+    max: 2.0
+  DorsalFin:
+    min: 0.2
+    max: 1.5
+  Rostrum:
+    min: 0.2
+    max: 1.5
+locomotion:
+  metabolic_multiplier: 3.0
+  convection_multiplier: 1.7
+  swimming_speed_m_s: 2.0
+appendage_perfusion_max: 0.5
+cche_effectiveness:
+  LeftPectoralFlipper:
+    min: 0.15
+    max: 0.9
+  RightPectoralFlipper:
+    min: 0.15
+    max: 0.9
+  Fluke:
+    min: 0.15
+    max: 0.9
+  Rostrum:
+    min: 0.2
+    max: 0.7
+  DorsalFin:
+    min: 0.15
+    max: 0.7
+  VentralGrooves:
+    min: 0.15
+    max: 0.7
+default_cases:
+- water_temp_C: -2.0
+  mode: active
+- water_temp_C: 0.0
+  mode: active
+- water_temp_C: 5.0
+  mode: active
+- water_temp_C: 10.0
+  mode: active
+- water_temp_C: 15.0
+  mode: active
+- water_temp_C: 20.0
+  mode: active
+- water_temp_C: 25.0
+  mode: active
+- water_temp_C: 28.0
+  mode: active
+- water_temp_C: 30.0
+  mode: active
+solved_arterial_temperature: false
+cche_saturation_C: 15.0

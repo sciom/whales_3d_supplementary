@@ -1,0 +1,188 @@
+# Blue Whale (Balaenoptera musculus) - Species Configuration
+# ==========================================================
+# Parameters based on peer-reviewed literature. See docs/blue_whale_references.md
+# for full citations and verification.
+
+species: blue_whale
+common_name: Blue Whale
+scientific_name: Balaenoptera musculus
+
+# Morphometrics
+body_mass_kg: 100000            # Adult mass ~100 t (Sears & Calambokidis 2002; Goldbogen et al. 2019)
+
+# -----------------------------------------------------------------------------
+# Physiology
+# -----------------------------------------------------------------------------
+# Core temperature: 36.6-37.2C for baleen whales (SeaWorld; Kanwisher & Sundnes 1966)
+# Postmortem measurements: fin whale 36.1C, minke/humpback 34.7C
+core_temperature_C: 36.0        # Rorqual measured range (no direct blue datum); was 36.7
+core_temperature_min_C: 28.0    # Lethal-hypothermia GUARD (comparative mammalian cardiac limit ~28 C; no measured cetacean value). See docs/lethal_hypothermia_threshold.md
+core_temperature_max_C: 40.0    # Lethal-hyperthermia GUARD (mammalian lethal ~42 C); not a normal-range bound.
+
+# Blue whales remain thermoneutral even at -2C (Lavigne et al. 1990)
+# 10C is conservative estimate
+thermoneutral_water_C: 10.0
+
+# -----------------------------------------------------------------------------
+# Scaling factors
+# -----------------------------------------------------------------------------
+# Large rorqual FMRs are less than half predicted from smaller mammals
+# (Blawas et al. 2025, Science Advances)
+# See docs/metabolic_derivation.md for allometric context
+metabolic_scale: 0.004          # DEPRECATED (A4/D3): no longer drives Q_m (now FMR-forward from fmr_watts); kept for diagnostic. See docs/metabolic_derivation.md
+fmr_watts: 9532                 # FMR estimate: ~50% Kleiber BMR for large rorquals (Blawas et al. 2025, Science Advances)
+fmr_source: "Blawas et al. 2025 Science Advances; ~50% of Kleiber at 100 t"
+perfusion_scale: 0.012          # BLUBBER-side CCHE reduction only (D1/A12); core keeps full arterial omega_b=0.8. Baseline under A2 review.
+                                # Hokkanen (1990, J Theor Biol 143:469-477); consistent with right whale validation.
+                                # Prior value 0.08 was ~7× too high, producing Q_loss >> FMR.
+transition_fraction: 0.15
+region_blend_iterations: 150
+region_blend_alpha: 0.5
+
+# -----------------------------------------------------------------------------
+# Transient solver defaults
+# -----------------------------------------------------------------------------
+# Thermal material properties are in data/blue_whale/materials.json
+# Blubber k=0.22 W/m-K based on Kvadsheim et al. (1996)
+dt_seconds: 300
+total_hours: 168
+min_hours: 48
+steady_eps: 1.0e-5
+
+# -----------------------------------------------------------------------------
+# Mesh paths (relative to project root)
+# -----------------------------------------------------------------------------
+mesh:
+  surface_obj: assets/meshes/blue_whale_surface.obj
+  volume_mesh: assets/meshes/blue_whale_variable_blubber.vtu
+  volume_raw: assets/meshes/blue_whale_volume_full_gmsh.vtk
+  element_size: 0.07            # UNIFORM physical element size across all species (run with --uniform-edge);
+                               # surface resampled to ~0.07 m edges so node/tet count scales with body volume -> comparable meshes.
+
+# -----------------------------------------------------------------------------
+# Data paths (relative to project root)
+# -----------------------------------------------------------------------------
+data:
+  vertex_groups: data/blue_whale/vertex_groups.json
+  surface_mesh: data/blue_whale/surface_mesh.json
+  surface_regions: data/blue_whale/surface_regions.json
+  tissue_info: data/blue_whale/tissue_info_variable.json
+
+# -----------------------------------------------------------------------------
+# Regional blubber thickness (meters)
+# -----------------------------------------------------------------------------
+# NOTE: Body thickness anchored to max-girth adult values from DFO CSAS
+# (see docs/blubber_thickness_references.md). Other regions scaled from legacy ratios.
+blubber_thickness:
+  Body: 0.1700            # 17 cm - max-girth adult (DFO CSAS)
+  Peduncle: 0.1322        # scaled from Body (legacy ratio)
+  Rostrum: 0.0756         # scaled from Body (legacy ratio)
+  LeftPectoralFlipper: 0.0378  # scaled from Body (legacy ratio)
+  RightPectoralFlipper: 0.0378 # scaled from Body (legacy ratio)
+  Fluke: 0.0472           # scaled from Body (legacy ratio)
+  DorsalFin: 0.0340       # scaled from Body (legacy ratio)
+  VentralGrooves: 0.0378  # scaled from Body (legacy ratio)
+
+# -----------------------------------------------------------------------------
+# Baseline convection coefficients (W/m^2-K)
+# -----------------------------------------------------------------------------
+# Appendages function as thermal windows with high heat flux
+# (Scholander & Schevill 1955; Kvadsheim & Folkow 1997)
+# Body: low convection due to thick blubber insulation
+# Flippers/flukes: high convection, countercurrent heat exchangers can bypass
+# Effective surface conductance (#19/A5): physical water-side values; insulation
+# in blubber + rete/shell counter-current terms, not a fake low h.
+convection_base:
+  Body: 35.0
+  Peduncle: 40.0
+  Rostrum: 50.0
+  DorsalFin: 55.0
+  VentralGrooves: 45.0
+  Fluke: 60.0
+  LeftPectoralFlipper: 60.0
+  RightPectoralFlipper: 60.0
+
+# -----------------------------------------------------------------------------
+# Thermoregulatory regions
+# -----------------------------------------------------------------------------
+# Regions with active vascular control via rete mirabile and AVAs
+# (Scholander & Schevill 1955). Body included for global perfusion scaling.
+thermoregulatory_regions:
+  - Body
+  - LeftPectoralFlipper
+  - RightPectoralFlipper
+  - Fluke
+  - DorsalFin
+  - VentralGrooves
+  - Rostrum
+
+# -----------------------------------------------------------------------------
+# Thermoregulation capacity
+# -----------------------------------------------------------------------------
+# 10-fold modulation possible through vascular control (Kvadsheim & Folkow 1997)
+convection_capacity:
+  LeftPectoralFlipper: { min: 0.3, max: 3.0 }
+  RightPectoralFlipper: { min: 0.3, max: 3.0 }
+  Fluke: { min: 0.3, max: 3.0 }
+  VentralGrooves: { min: 0.5, max: 2.0 }
+  DorsalFin: { min: 0.7, max: 1.5 }
+  Rostrum: { min: 0.7, max: 1.5 }
+
+# -----------------------------------------------------------------------------
+# Perfusion modulation capacity
+# -----------------------------------------------------------------------------
+# Blood flow control for heat retention/dissipation
+perfusion_capacity:
+  Body: { min: 0.7, max: 1.3 }
+  LeftPectoralFlipper: { min: 0.05, max: 3.0 }
+  RightPectoralFlipper: { min: 0.05, max: 3.0 }
+  Fluke: { min: 0.05, max: 3.0 }
+  VentralGrooves: { min: 0.1, max: 2.0 }
+  DorsalFin: { min: 0.2, max: 1.5 }
+  Rostrum: { min: 0.2, max: 1.5 }
+
+# -----------------------------------------------------------------------------
+# Locomotion parameters for swimming (moving) mode
+# -----------------------------------------------------------------------------
+# Metabolic multiplier derived from Williams (1999) cost-of-transport equation:
+#   COT_total = 7.79 * M^(-0.29) J/kg/m (Phil. Trans. R. Soc. B 354:193-201)
+#   At ~100,000 kg and 2.0 m/s: total MR ≈ 2.9x Kleiber BMR; rounded to 3.0x
+# Swimming speed: ~2.0 m/s routine cruising (Gough et al. 2019, J. Exp. Biol. 222:jeb204172)
+#   Calderan et al. (2023, Front. Mar. Sci. 10:1087967) report mean 1.6 m/s in Antarctic
+#   Gough et al. find ~2 m/s invariant across rorqual species
+# Note: Blawas et al. (2025, Science Advances) measured blue whale foraging FMR
+#   only 1.2-1.6x non-foraging, but bout-averaged; sustained swimming MR is higher
+locomotion:
+  metabolic_multiplier: 3.0       # Williams (1999) COT at 100 t, 2.0 m/s -> ~2.9x Kleiber BMR; rounded to 3.0
+  convection_multiplier: 1.7      # h ~ v^0.8 turbulent flat-plate (Incropera et al. 2011): (2.0/1.0)^0.8 = 1.74
+  swimming_speed_m_s: 2.0
+
+
+# Counter-current heat-exchange (CCHE) control -- D2 / audit A2,A3.
+# Thermoregulation = appendage effectiveness epsilon in [0,1] (cold->conserve,
+# warm->dump), applied to the dilated appendage AVA perfusion. This REPLACES the
+# perfusion_capacity magnitude control below (now DEPRECATED/unused) and any
+# h-modulation (h is flow/geometry only). See docs/cche_effectiveness.md.
+appendage_perfusion_max: 0.5      # omega_app, dilated AVA capacity [kg/m3/s]; SENSITIVITY var (sweep 0.3-0.8)
+cche_effectiveness:               # epsilon range per window: min=dump (AVAs open), max=conserve (retia)
+  LeftPectoralFlipper:  { min: 0.15, max: 0.90 }
+  RightPectoralFlipper: { min: 0.15, max: 0.90 }
+  Fluke:                { min: 0.15, max: 0.90 }
+  Rostrum:              { min: 0.20, max: 0.70 }
+  DorsalFin:            { min: 0.15, max: 0.70 }
+  VentralGrooves:       { min: 0.15, max: 0.70 }
+
+# -----------------------------------------------------------------------------
+# Default simulation cases
+# -----------------------------------------------------------------------------
+# Blue whales encounter -2C to 25C+ across migration (Antarctic to tropics)
+default_cases:
+  - { water_temp_C: -2.0, mode: active }
+  - { water_temp_C: 0.0,  mode: active }
+  - { water_temp_C: 5.0,  mode: active }
+  - { water_temp_C: 10.0, mode: active }
+  - { water_temp_C: 15.0, mode: active }
+  - { water_temp_C: 20.0, mode: active }
+  - { water_temp_C: 25.0, mode: active }
+  - { water_temp_C: 28.0, mode: active }
+  - { water_temp_C: 30.0, mode: active }
