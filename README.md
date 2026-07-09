@@ -6,18 +6,17 @@ This repository contains curated supplementary material for the manuscript:
 
 The repository is intended for journal submission and peer review.  It contains
 processed simulation outputs, sensitivity summaries, model-support tables,
-selected validation figures, and scripts needed to regenerate the manuscript
-figures from the processed outputs.
+selected validation figures, and scripts needed to regenerate figure outputs
+from the processed data.
 
 ## Contents
 
-- `manuscript/` - current manuscript PDF snapshot.
 - `data/processed/` - processed multicase result summaries for each whale model.
 - `data/sensitivity/` - sensitivity-analysis summaries and configuration files.
 - `data/model_support/` - literature-derived model-support tables.
 - `data/species/` - species parameter files used by the simulations.
 - `data/csv_tables/` - structured parameter tables used during model assembly.
-- `figures/` - exported manuscript figures and mesh-validation images.
+- `figures/` - exported figure files and mesh-validation images.
 - `scripts/` - postprocessing utilities required to regenerate figure outputs.
 - `docs/` - notes for reviewers and maintainers.
 
