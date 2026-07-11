@@ -11,8 +11,8 @@ authors:
     given-names: "Branimir K."
 identifiers:
   - type: doi
-    value: "10.5281/zenodo.21276037"
+    value: "10.5281/zenodo.21308022"
     description: "Zenodo archive of the supplementary materials"
-repository-code: "https://doi.org/10.5281/zenodo.21276037"
+repository-code: "https://doi.org/10.5281/zenodo.21308022"
 date-released: "2026-07-11"
 license: "CC-BY-4.0"
