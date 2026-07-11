@@ -1,0 +1,19 @@
+\begin{table}[htbp]
+\centering
+\caption{Quantitative geometry and mass-consistency check of the classified production meshes. $V$ is the sum of the solver's own tetrahedral cell volumes; $A$ is summed over the extracted boundary faces. The implied bulk density $\rho=M/V$ should approach the $\sim$1000\,kg\,m$^{-3}$ of whale tissue. It does so for the right whale, bowhead and minke, but is substantially lower for the blue, humpback, fin, gray and sei meshes ($\rho\approx440$--890\,kg\,m$^{-3}$), indicating that these surface models are geometrically larger than their prescribed body mass implies. Because surface heat loss scales with area, absolute heat-loss magnitudes for the low-density species carry a corresponding geometric-scaling uncertainty (of order the cube-root-squared of the density ratio); the mass-specific and cross-species comparative results are more robust than the absolute values. $\tau=\rho c\,V/(h_{\mathrm{eff}}A)$ with $\rho c=3.4\times10^{6}$\,J\,m$^{-3}$\,K$^{-1}$.}
+\label{tab:geometry}
+\begin{tabular}{lrrrrrrr}
+\hline
+Species & $V$ (m$^3$) & $A$ (m$^2$) & $M$ (kg) & $\rho$ (kg\,m$^{-3}$) & Blubber (\%) & SA:V (m$^{-1}$) & $\tau$ (h) \\
+\hline
+Humpback & 53.14 & 123.43 & 30000 & 565 & 12.6 & 2.323 & 8.9 \\
+Right whale & 57.94 & 118.19 & 60000 & 1036 & 18.8 & 2.040 & 11.3 \\
+Blue whale & 226.09 & 305.23 & 100000 & 442 & 14.4 & 1.350 & 16.6 \\
+Bowhead & 82.21 & 144.91 & 80000 & 973 & 35.7 & 1.763 & 13.1 \\
+Fin whale & 112.99 & 193.43 & 70000 & 620 & 11.7 & 1.712 & 13.2 \\
+Gray whale & 33.12 & 97.74 & 25000 & 755 & 32.2 & 2.951 & 7.9 \\
+Sei whale & 22.55 & 70.48 & 20000 & 887 & 12.7 & 3.125 & 7.3 \\
+Minke & 6.83 & 28.72 & 7000 & 1025 & 14.4 & 4.206 & 5.3 \\
+\hline
+\end{tabular}
+\end{table}

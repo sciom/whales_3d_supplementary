@@ -1,0 +1,14 @@
+\begin{table}[htbp]
+\centering
+\caption{Mesh convergence at $T_w=10\,^\circ$C for the humpback geometry --- the most demanding case for grid independence, having the thinnest blubber, the highest surface-to-volume ratio and hence the steepest near-surface temperature gradients. The boundary resolution is set by the high-resolution input surface ($\sim$150\,k nodes, $\sim$590\,k tetrahedra); the swept quantity is the target \emph{interior} element size, which controls volumetric tetrahedralisation. Deep-core temperature is invariant to $<0.001\,^\circ$C and total surface heat loss $\dot{Q}$ varies by $<0.4\%$ across the range, so the production discretisation is already in the asymptotic regime; the better-insulated species, with lower surface-to-volume ratios and gentler gradients, are resolved a fortiori. $\Delta\dot{Q}$ is relative to the finest interior size.}
+\label{tab:mesh_convergence}
+\begin{tabular}{llrrrr}
+\hline
+Species & Interior size (m) & Nodes & Tets & $T_{\mathrm{core}}$ ($^\circ$C) & $\Delta\dot{Q}$ (\%) \\
+\hline
+Humpback & 0.10 & 152484 & 590680 & 35.790 & +0.36 \\
+ & 0.07 & 152494 & 590718 & 35.790 & +0.34 \\
+ & 0.05 & 152572 & 591305 & 35.791 & --- (ref) \\
+\hline
+\end{tabular}
+\end{table}

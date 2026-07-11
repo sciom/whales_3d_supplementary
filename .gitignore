@@ -27,6 +27,9 @@ __pycache__/
 *.h5
 *.hdf5
 
+# ...except one complete raw worked example, archived for end-to-end verification
+!data/raw_example/*.vtu
+
 # Local environments
 .venv/
 venv/

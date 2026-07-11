@@ -1,0 +1,20 @@
+\begin{table}[htbp]
+\centering
+\caption{Global sensitivity analysis of surface heat loss $\log Q_{\mathrm{surface}}$ at $T_w=-2\,^\circ$C. For each of the eight uncertain inputs and three species we report the Morris mean-absolute elementary effect $\mu^{*}$ (screening) and the Sobol total-effect index $S_T$ from a polynomial emulator; parameters are ordered by mean $S_T$. In a 2000-sample Latin-hypercube ensemble over all eight parameters the balaenid (bowhead) retained a lower mass-specific surface cost than both rorquals in 100\% of draws, confirming the family ranking is robust to joint parameter uncertainty. Emulator held-out $R^2$: Humpback 1.00, Fin 1.00, Bowhead 0.99.}
+\label{tab:gsa}
+\begin{tabular}{lrrrrrr}
+\hline
+& \multicolumn{2}{c}{Humpback} & \multicolumn{2}{c}{Fin} & \multicolumn{2}{c}{Bowhead} \\
+Parameter & $\mu^{*}$ & $S_T$ & $\mu^{*}$ & $S_T$ & $\mu^{*}$ & $S_T$ \\
+\hline
+AVA & 0.33 & 0.68 & 0.30 & 0.56 & 0.44 & 0.30 \\
+$T_{\mathrm{tn}}$ & 0.00 & 0.00 & 0.11 & 0.07 & 0.64 & 0.63 \\
+$\omega_{\mathrm{core}}$ & 0.15 & 0.13 & 0.12 & 0.09 & 0.02 & 0.00 \\
+$k_{\mathrm{blub}}$ & 0.09 & 0.06 & 0.13 & 0.12 & 0.14 & 0.03 \\
+$h$ & 0.12 & 0.09 & 0.12 & 0.08 & 0.13 & 0.02 \\
+BCI & 0.08 & 0.04 & 0.11 & 0.08 & 0.11 & 0.02 \\
+CCHE & 0.02 & 0.00 & 0.01 & 0.00 & 0.01 & 0.00 \\
+FMR & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
+\hline
+\end{tabular}
+\end{table}

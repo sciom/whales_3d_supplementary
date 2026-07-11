@@ -1,0 +1,7 @@
+species,element_size,tag,status,plc_error,n_nodes,n_tets,core_temp_C,q_loss_W,deep_body_C,gen_s,solve_s,V_m3
+bowhead,0.1,100,gmsh_failed,False,,,,,,,,
+bowhead,0.07,070,gmsh_failed,False,,,,,,,,
+bowhead,0.05,050,gmsh_failed,False,,,,,,,,
+humpback,0.1,100,ok,False,152484,590680,35.7901,32857.51,36.0304,90.4,24.2,53.1431
+humpback,0.07,070,ok,False,152494,590718,35.7904,32850.21,36.0304,89.6,22.3,53.1431
+humpback,0.05,050,ok,False,152572,591305,35.7909,32740.24,36.0304,89.5,22.4,53.1431

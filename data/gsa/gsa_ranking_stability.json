@@ -1,0 +1,47 @@
+{
+  "emulator_R2": {
+    "humpback": {
+      "r2_train": 0.9998187414700102,
+      "r2_cv": 0.9995808608218584,
+      "r2_test": 0.999585859801246
+    },
+    "fin_whale": {
+      "r2_train": 0.9994270357630622,
+      "r2_cv": 0.9986936017522655,
+      "r2_test": 0.9984190715637443
+    },
+    "bowhead": {
+      "r2_train": 0.9977354989257101,
+      "r2_cv": 0.9952613949530325,
+      "r2_test": 0.9931883692754775
+    }
+  },
+  "stability": {
+    "n_samples": 2000,
+    "frac_bowhead_below_both": 1.0,
+    "frac_bowhead_below_humpback": 1.0,
+    "frac_bowhead_below_fin": 1.0,
+    "frac_rank_reversal": 0.0,
+    "mean_msc_W_per_kg": {
+      "humpback": 0.9249662590191149,
+      "fin_whale": 0.610259305815425,
+      "bowhead": 0.28331837354228107
+    },
+    "median_msc_W_per_kg": {
+      "humpback": 0.9266664660697946,
+      "fin_whale": 0.6086133602765489,
+      "bowhead": 0.27676850406618325
+    }
+  },
+  "params": [
+    "k_blub",
+    "BCI",
+    "h",
+    "omega_core",
+    "cche",
+    "ava",
+    "Ttn",
+    "fmr"
+  ],
+  "Tw_C": -2.0
+}
